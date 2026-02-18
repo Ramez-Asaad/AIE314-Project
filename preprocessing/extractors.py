@@ -96,9 +96,36 @@ def extract_docx(filepath: str) -> tuple[dict[str, Any], list[tuple[int, str]]]:
     return metadata, paragraphs
 
 
+def _format_cell(cell) -> str:
+    """Format a single cell value for readable text output."""
+    if cell is None:
+        return ""
+    if isinstance(cell, datetime):
+        # Strip time component if it's midnight (date-only values)
+        if cell.hour == 0 and cell.minute == 0 and cell.second == 0:
+            return cell.strftime("%Y-%m-%d")
+        return cell.isoformat()
+    if isinstance(cell, bool):
+        return "Yes" if cell else "No"
+    if isinstance(cell, float):
+        # Clean up float display: 3.0 → "3", 3.85 → "3.85"
+        if cell == int(cell):
+            return str(int(cell))
+        return f"{cell:.4g}"
+    return str(cell).strip()
+
+
 def extract_xlsx(filepath: str) -> tuple[dict[str, Any], list[tuple[int, str]]]:
     """
     Extract text and metadata from an Excel file.
+
+    Produces self-contained row-group chunks where each chunk carries
+    column headers so it remains meaningful in isolation.
+
+    Format per chunk:
+        [Sheet: SheetName]
+        Row 1: Column1=Value1 | Column2=Value2 | ...
+        Row 2: Column1=Value1 | Column2=Value2 | ...
 
     Returns:
         Tuple of (metadata dict, list of (sheet_number, text) tuples).
@@ -106,26 +133,71 @@ def extract_xlsx(filepath: str) -> tuple[dict[str, Any], list[tuple[int, str]]]:
     metadata = extract_metadata_base(filepath)
 
     wb = openpyxl.load_workbook(filepath, read_only=True, data_only=True)
-    sheets: list[tuple[int, str]] = []
+    sections: list[tuple[int, str]] = []
 
-    for i, sheet_name in enumerate(wb.sheetnames):
+    ROWS_PER_CHUNK = 15  # Group rows into chunks of this size
+
+    for sheet_idx, sheet_name in enumerate(wb.sheetnames):
         ws = wb[sheet_name]
-        rows: list[str] = []
-        rows.append(f"[Sheet: {sheet_name}]")
 
-        for row in ws.iter_rows(values_only=True):
-            cell_values = [str(cell) if cell is not None else "" for cell in row]
-            row_text = " | ".join(cell_values).strip()
-            if row_text.replace("|", "").strip():
-                rows.append(row_text)
+        # Collect all rows
+        all_rows = list(ws.iter_rows(values_only=True))
+        if not all_rows:
+            continue
 
-        if len(rows) > 1:  # More than just the header
-            sheets.append((i + 1, "\n".join(rows)))
+        # Detect header row (first non-empty row)
+        headers: list[str] = []
+        data_start = 0
+        for row_idx, row in enumerate(all_rows):
+            non_empty = [c for c in row if c is not None]
+            if non_empty:
+                headers = [str(c).strip() if c is not None else f"Col{i+1}"
+                           for i, c in enumerate(row)]
+                data_start = row_idx + 1
+                break
+
+        if not headers:
+            continue
+
+        # Collect data rows
+        data_rows: list[list[str]] = []
+        for row in all_rows[data_start:]:
+            formatted = [_format_cell(c) for c in row]
+            # Skip fully empty rows
+            if any(v for v in formatted):
+                data_rows.append(formatted)
+
+        if not data_rows:
+            # Sheet only has headers, output them anyway
+            header_line = " | ".join(headers)
+            sections.append((
+                sheet_idx + 1,
+                f"[Sheet: {sheet_name}]\nColumns: {header_line}\n(No data rows)"
+            ))
+            continue
+
+        # Split data rows into groups for chunking
+        for group_start in range(0, len(data_rows), ROWS_PER_CHUNK):
+            group = data_rows[group_start:group_start + ROWS_PER_CHUNK]
+            lines: list[str] = [f"[Sheet: {sheet_name}]"]
+
+            for row_offset, row_values in enumerate(group):
+                row_num = data_start + group_start + row_offset + 1
+                # Format as key=value pairs
+                pairs: list[str] = []
+                for header, value in zip(headers, row_values):
+                    if value:  # Skip empty cells
+                        pairs.append(f"{header}={value}")
+                if pairs:
+                    lines.append(f"Row {row_num}: {' | '.join(pairs)}")
+
+            if len(lines) > 1:  # More than just the sheet header
+                sections.append((sheet_idx + 1, "\n".join(lines)))
 
     metadata["page_count"] = len(wb.sheetnames)
     wb.close()
 
-    return metadata, sheets
+    return metadata, sections
 
 
 def extract_pptx(filepath: str) -> tuple[dict[str, Any], list[tuple[int, str]]]:

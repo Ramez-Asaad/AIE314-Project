@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "filename": "computer_science_overview.pdf",
+    "filetype": "pdf",
+    "title": "computer_science_overview",
+    "author": "python-docx",
+    "page_count": 3,
+    "processed_at": "2026-02-18T16:30:24.330399+00:00"
+  },
+  "chunks": [
+    {
+      "chunk_id": 0,
+      "text": "Introduction to Computer Science \nWhat is Computer Science? Computer Science is the study of computation, information, and automation. It focuses on \nhow data is represented, processed, stored, and transmitted using computers. The field \ncombines theory, engineering, and experimentation.Computer Science is the study of \ncomputation, information, and automation. It focuses on how data is represented, \nprocessed, stored, and transmitted using computers. The field combines theory, \nengineering, and experimentati on.Computer Science is the study of computation, \ninformation, and automation. It focuses on how data is represented, processed, stored, and \ntransmitted using computers.",
+      "page": 1
+    },
+    {
+      "chunk_id": 1,
+      "text": "The field combines theory, engineering, and experimentation. Algorithms and Data Struct ures \nAlgorithms are step -by-step procedures for solving problems. Data structures organize and \nstore data efficiently. Common data structures include arrays, linked lists, stacks, queues, \ntrees, and graphs.Algorithms are step -by-step procedures for solving problems. Data \nstructures organize and store data efficiently. Common data structures include arrays, \nlinked lists, stacks, queues, trees, and graphs.Algorithms are step -by-step procedures for \nsolving problems. Data structures organize and store data effi ciently. Common data \nstructures include arrays, linked lists, stacks, queues, trees, and graphs.",
+      "page": 1
+    },
+    {
+      "chunk_id": 2,
+      "text": "Programming Languages \nProgramming languages allow humans to communicate instructions to computers. Popular \nlanguages include Python, Java, C++, JavaScript, and Go. Languages can be low -level or high -\nlevel, compiled or interpreted.Programming languages allow humans to communicate \ninstructions to computers. Popular languages include Python, Java, C++, JavaScript, and Go. Languages can be low -level or high -level, c ompiled or interpreted.Programming languages \nallow humans to communicate instructions to computers. Popular languages include \nPython, Java, C++, JavaScript, and Go.",
+      "page": 1
+    },
+    {
+      "chunk_id": 3,
+      "text": "Languages can be low -level or high -level, compiled or \ninterpreted. Operating Systems \nAn ope rating system manages hardware and software resources. It handles process \nscheduling, memory management, file systems, and device drivers. Examples include \nWindows, Linux, and macOS.An operating system manages hardware and software \nresources. It handles pr ocess scheduling, memory management, file systems, and device \ndrivers. Examples include Windows, Linux, and macOS.An operating system manages \nhardware and software resources. It handles process scheduling, memory management, file \nsystems, and device driver s. Examples include Windows, Linux, and macOS.",
+      "page": 1
+    },
+    {
+      "chunk_id": 4,
+      "text": "Databases and Data Management \nDatabases store structured data for efficient retrieval. Relational databases use tables and \nSQL, while NoSQL databases handle unstructured data. Data consistency, indexing, and \ntransactions are core concepts.Databases store structured data for efficient retrieval. Relational databases use tables and SQL, while NoSQL databases handle unstructured data. Data consistency, indexing, and transactions are core concepts.Databases store s tructured \ndata for efficient retrieval. Relational databases use tables and SQL, while NoSQL databases \nhandle unstructured data. Data consistency, indexing, and transactions are core concepts.",
+      "page": 2
+    },
+    {
+      "chunk_id": 5,
+      "text": "Computer Networks \nComputer networks allow devices to communicat e and share resources. The Internet is the \nlargest example. Key topics include TCP/IP, routing, DNS, and network security.Computer \nnetworks allow devices to communicate and share resources. The Internet is the largest \nexample. Key topics include TCP/IP, ro uting, DNS, and network security.Computer \nnetworks allow devices to communicate and share resources. The Internet is the largest \nexample. Key topics include TCP/IP, routing, DNS, and network security.",
+      "page": 2
+    },
+    {
+      "chunk_id": 6,
+      "text": "Artificial Intelligence and Machine Learning \nAI focuses on creating systems that mimic human intelligence. Machine learning enables \nsystems to learn patterns from data. Applications include image recognition, NLP, and \nrecommendation systems.AI focuses on creating systems that mimic human intelligence. Machine learning enables systems to learn patterns from data. Applications include image \nrecognition, NLP, and recommendation systems.AI focuses on creating systems that mimic \nhuman intelligence. Machine learning enables systems to learn patterns from data.",
+      "page": 2
+    },
+    {
+      "chunk_id": 7,
+      "text": "Applic ations include image recognition, NLP, and recommendation systems. Software Engineering \nSoftware engineering applies engineering principles to software development. It includes \nrequirements analysis, design, testing, deployment, and maintenance. Agile and DevOps are \ncommon methodologies.Software engineering applies engineering principles to software \ndevelopment. It includes requirements analysis, design, testing, deployment, and \nmaintenance. Agile and DevOps are common methodologies.Software engineering app lies \nengineering principles to software development. It includes requirements analysis, design, \ntesting, deployment, and maintenance.",
+      "page": 2
+    },
+    {
+      "chunk_id": 8,
+      "text": "Agile and DevOps are common methodologies. Cybersecurity \nCybersecurity protects systems from attacks and unauthorized acce ss. It includes \nencryption, authentication, secure coding, and threat detection. Security is critical in \nmodern digital systems.Cybersecurity protects systems from attacks and unauthorized \naccess. It includes encryption, authentication, secure coding, and threat detection. Security \nis critical in modern digital systems.Cybersecurity protects systems from attacks and \nunauthorized access. It includes encryption, authentication, secure coding, and threat \ndetection. Security is critical in modern digital system s.",
+      "page": 2
+    },
+    {
+      "chunk_id": 9,
+      "text": "Future of Computer Science \nEmerging areas include quantum computing, edge AI, and autonomous systems. Computer \nscience continues to shape healthcare, education, finance, and industry.Emerging areas \ninclude quantum computing, edge AI, and autonomous syst ems. Computer science \ncontinues to shape healthcare, education, finance, and industry.Emerging areas include \nquantum computing, edge AI, and autonomous systems. Computer science continues to \nshape healthcare, education, finance, and industry.",
+      "page": 3
+    }
+  ]
+}
