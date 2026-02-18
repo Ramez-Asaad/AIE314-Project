@@ -9,7 +9,7 @@
 ## Project Description
 This project is part of the **AI-Based Programming (AIE314)** course. The overarching goal is to build an **AI Agentic Study & Courses Assistant** powered by Retrieval-Augmented Generation (RAG).
 
-This tutorial focuses on the **preprocessing pipeline** — the foundational step of any RAG system. The pipeline ingests unstructured data from various document formats (PDF, Word, Excel, PowerPoint, EPUB) and normalizes them into structured JSON suitable for embedding and retrieval.
+This tutorial focuses on the **preprocessing pipeline**, the foundational step of any RAG system. The pipeline ingests unstructured data from various document formats (PDF, Word, Excel, PowerPoint, EPUB) and normalizes them into structured JSON suitable for embedding and retrieval.
 
 ### Key Features
 - **Multi-format support**: PDF, DOCX, XLSX, PPTX, EPUB
@@ -25,23 +25,23 @@ This tutorial focuses on the **preprocessing pipeline** — the foundational ste
                  │
                  ▼
         ┌─────────────────┐
-        │   1. EXTRACTION  │  extractors.py — format-specific text & metadata extraction
+        │   1. EXTRACTION │  extractors.py — format-specific text & metadata extraction
         └────────┬────────┘
                  ▼
         ┌─────────────────┐
-        │   2. CLEANING    │  cleaners.py — encoding fixes, control chars, whitespace
+        │   2. CLEANING   │  cleaners.py — encoding fixes, control chars, whitespace
         └────────┬────────┘
                  ▼
         ┌─────────────────┐
-        │ 3. NORMALIZATION │  normalizers.py — NFKC, typography, OCR, LaTeX, URLs
+        │3. NORMALIZATION │  normalizers.py — NFKC, typography, OCR, LaTeX, URLs
         └────────┬────────┘
                  ▼
         ┌─────────────────┐
-        │   4. CHUNKING    │  chunkers.py — semantic chunking via sentence embeddings
+        │   4. CHUNKING   │  chunkers.py — semantic chunking via sentence embeddings
         └────────┬────────┘
                  ▼
         ┌─────────────────┐
-        │   5. OUTPUT      │  pipeline.py — normalized JSON with metadata + chunks
+        │   5. OUTPUT     │  pipeline.py — normalized JSON with metadata + chunks
         └─────────────────┘
 ```
 
@@ -126,9 +126,9 @@ The pipeline applies 6 normalization techniques chosen specifically for RAG (pre
 | 6 | **URL/Email Tagging** | `https://...` → `[URL: https://...]` |
 
 **Techniques intentionally avoided** (they degrade embedding quality):
-- Case folding — embeddings are case-aware
-- Stopword removal — destroys sentence structure
-- Lemmatization/Stemming — modern embeddings handle morphology natively
+- Case folding: embeddings are case-aware
+- Stopword removal: destroys sentence structure
+- Lemmatization/Stemming: modern embeddings handle morphology natively
 
 ## Chunking Strategy
 
