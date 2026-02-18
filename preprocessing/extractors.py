@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timezone
 from typing import Any
 
-import PyPDF2
+import pdfplumber
 import docx
 import openpyxl
 from pptx import Presentation
@@ -32,7 +32,11 @@ def extract_metadata_base(filepath: str) -> dict[str, Any]:
 
 def extract_pdf(filepath: str) -> tuple[dict[str, Any], list[tuple[int, str]]]:
     """
-    Extract text and metadata from a PDF file.
+    Extract text and metadata from a PDF file using pdfplumber.
+
+    Uses tuned x_tolerance for accurate word boundary detection,
+    which avoids the mid-word space artifacts common with PyPDF2
+    on justified text.
 
     Returns:
         Tuple of (metadata dict, list of (page_number, text) tuples).
@@ -40,17 +44,18 @@ def extract_pdf(filepath: str) -> tuple[dict[str, Any], list[tuple[int, str]]]:
     metadata = extract_metadata_base(filepath)
     pages: list[tuple[int, str]] = []
 
-    with open(filepath, "rb") as f:
-        reader = PyPDF2.PdfReader(f)
-        info = reader.metadata
+    with pdfplumber.open(filepath) as pdf:
+        # Extract metadata from PDF info dict
+        info = pdf.metadata or {}
+        metadata["title"] = info.get("Title") or metadata["title"]
+        metadata["author"] = info.get("Author")
+        metadata["page_count"] = len(pdf.pages)
 
-        if info:
-            metadata["title"] = info.title or metadata["title"]
-            metadata["author"] = info.author
-        metadata["page_count"] = len(reader.pages)
-
-        for i, page in enumerate(reader.pages):
-            text = page.extract_text() or ""
+        for i, page in enumerate(pdf.pages):
+            text = page.extract_text(
+                x_tolerance=3,  # Horizontal tolerance for grouping chars into words
+                y_tolerance=3,  # Vertical tolerance for grouping chars into lines
+            ) or ""
             if text.strip():
                 pages.append((i + 1, text))
 

@@ -1,5 +1,5 @@
 # Document parsing
-PyPDF2>=3.0.0          # PDF text extraction
+pdfplumber>=0.10.0         # PDF text extraction (better word boundary handling)
 python-docx>=1.1.0     # Word document parsing
 openpyxl>=3.1.0        # Excel file parsing
 python-pptx>=0.6.23    # PowerPoint parsing

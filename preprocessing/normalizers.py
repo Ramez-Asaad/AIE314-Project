@@ -12,6 +12,7 @@ Normalizations applied (in order):
 
 import re
 import unicodedata
+from functools import lru_cache
 
 
 # ─── 1. Unicode NFKC Normalization ──────────────────────────────────────────
@@ -127,6 +128,99 @@ def repair_ocr_artifacts(text: str) -> str:
     # Collapse double spaces (but not leading indentation)
     text = re.sub(r'(?<=\S)  +(?=\S)', ' ', text)
 
+    return text
+
+
+# ─── 3b. Broken Word Repair (dictionary-based) ─────────────────────────────
+
+@lru_cache(maxsize=1)
+def _load_word_set() -> set[str]:
+    """
+    Load the NLTK English word corpus as a lowercase set.
+
+    Downloads the corpus automatically on first use if not already present.
+    Falls back to an empty set if NLTK is unavailable.
+    """
+    try:
+        import nltk
+        try:
+            from nltk.corpus import words
+            word_list = words.words()
+        except LookupError:
+            nltk.download("words", quiet=True)
+            from nltk.corpus import words
+            word_list = words.words()
+        return {w.lower() for w in word_list}
+    except ImportError:
+        return set()
+
+
+def _is_word(token: str) -> bool:
+    """Check if a token is a recognized English word."""
+    return token.lower() in _load_word_set()
+
+
+def repair_broken_words(text: str) -> str:
+    """
+    Heal mid-word spaces using dictionary lookup.
+
+    PDF extractors sometimes insert a space mid-word due to glyph
+    positioning (e.g., justified text). This function detects adjacent
+    fragments that individually are not real words but form a valid word
+    when merged.
+
+    Examples:
+        "Struct ures" → "Structures"
+        "acce ss" → "access"
+        "experimentati on" → "experimentation"
+    """
+    word_set = _load_word_set()
+    if not word_set:
+        return text  # No dictionary available, skip
+
+    # Pattern: two alpha fragments separated by a single space,
+    # where at least one fragment is 2+ chars (to avoid merging
+    # real single-letter words like "a" or "I")
+    pattern = re.compile(r'\b([A-Za-z]{2,})\s([A-Za-z]{2,})\b')
+
+    def _try_merge(match: re.Match) -> str:
+        left, right = match.group(1), match.group(2)
+        merged = left + right
+
+        # Only merge if:
+        # - Neither fragment is a recognized word on its own
+        # - The merged result IS a recognized word
+        left_is_word = left.lower() in word_set
+        right_is_word = right.lower() in word_set
+
+        if not left_is_word and not right_is_word and merged.lower() in word_set:
+            return merged
+
+        return match.group(0)  # Keep original
+
+    # Run multiple passes since merging can reveal new merge opportunities
+    for _ in range(3):
+        new_text = pattern.sub(_try_merge, text)
+        if new_text == text:
+            break
+        text = new_text
+
+    return text
+
+
+def repair_spaced_hyphens(text: str) -> str:
+    """
+    Fix spaces around hyphens in compound words.
+
+    PDF extraction sometimes inserts spaces around hyphens:
+        "step -by-step" → "step-by-step"
+        "high -level" → "high-level"
+        "re -use" → "re-use"
+    """
+    # Space before hyphen: "step -by" → "step-by"
+    text = re.sub(r'(\w)\s+-(\w)', r'\1-\2', text)
+    # Space after hyphen: "step- by" → "step-by"
+    text = re.sub(r'(\w)-\s+(\w)', r'\1-\2', text)
     return text
 
 
@@ -270,14 +364,18 @@ def normalize_text(text: str) -> str:
     Steps (in order):
         1. Unicode NFKC normalization
         2. Typographic normalization (quotes, dashes, bullets)
-        3. OCR artifact repair (spaced words, broken hyphens)
+        3a. OCR artifact repair (spaced-out words, broken hyphens)
+        3b. Broken word repair (dictionary-based merging)
+        3c. Spaced hyphen repair (compound word fixes)
         4. Header/footer noise removal (page numbers)
-        5. LaTeX cleanup (math symbols → readable text)
+        5. LaTeX cleanup (math symbols -> readable text)
         6. URL/email tagging
     """
     text = normalize_unicode_nfkc(text)
     text = normalize_typography(text)
     text = repair_ocr_artifacts(text)
+    text = repair_broken_words(text)
+    text = repair_spaced_hyphens(text)
     text = remove_header_footer_noise(text)
     text = normalize_latex(text)
     text = tag_urls_and_emails(text)
