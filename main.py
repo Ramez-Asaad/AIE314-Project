@@ -3,7 +3,7 @@ Entry point for the preprocessing pipeline.
 
 Usage:
     python main.py
-    python main.py --input data --output output --chunk-size 500 --overlap 50
+    python main.py --input data --output output --breakpoint-percentile 80
 """
 
 import argparse
@@ -28,16 +28,22 @@ def main():
         help="Directory for output JSON files (default: output)",
     )
     parser.add_argument(
-        "--chunk-size",
+        "--breakpoint-percentile",
         type=int,
-        default=500,
-        help="Maximum chunk size in characters (default: 500)",
+        default=80,
+        help="Sensitivity for semantic topic-shift detection, 0-100 (default: 80). Lower = more chunks.",
     )
     parser.add_argument(
-        "--overlap",
+        "--min-chunk-size",
         type=int,
-        default=50,
-        help="Overlap between chunks in characters (default: 50)",
+        default=100,
+        help="Minimum chunk size in characters (default: 100)",
+    )
+    parser.add_argument(
+        "--max-chunk-size",
+        type=int,
+        default=1500,
+        help="Maximum chunk size in characters (default: 1500)",
     )
 
     args = parser.parse_args()
@@ -45,8 +51,9 @@ def main():
     pipeline = PreprocessingPipeline(
         input_dir=args.input,
         output_dir=args.output,
-        chunk_size=args.chunk_size,
-        chunk_overlap=args.overlap,
+        breakpoint_percentile=args.breakpoint_percentile,
+        min_chunk_size=args.min_chunk_size,
+        max_chunk_size=args.max_chunk_size,
     )
 
     print("🚀 Starting preprocessing pipeline...\n")

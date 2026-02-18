@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from .extractors import get_extractor
 from .cleaners import clean_text
-from .chunkers import DEFAULT_CHUNKER
+from .chunkers import DEFAULT_CHUNKER, chunk_by_semantic
 
 
 class PreprocessingPipeline:
@@ -29,13 +29,15 @@ class PreprocessingPipeline:
         self,
         input_dir: str = "data",
         output_dir: str = "output",
-        chunk_size: int = 500,
-        chunk_overlap: int = 50,
+        breakpoint_percentile: int = 80,
+        min_chunk_size: int = 100,
+        max_chunk_size: int = 1500,
     ):
         self.input_dir = input_dir
         self.output_dir = output_dir
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
+        self.breakpoint_percentile = breakpoint_percentile
+        self.min_chunk_size = min_chunk_size
+        self.max_chunk_size = max_chunk_size
 
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -80,8 +82,9 @@ class PreprocessingPipeline:
         for page_num, text in cleaned_pages:
             page_chunks = DEFAULT_CHUNKER(
                 text,
-                chunk_size=self.chunk_size,
-                overlap=self.chunk_overlap,
+                breakpoint_percentile=self.breakpoint_percentile,
+                min_chunk_size=self.min_chunk_size,
+                max_chunk_size=self.max_chunk_size,
             )
             for chunk_text in page_chunks:
                 chunks.append(
