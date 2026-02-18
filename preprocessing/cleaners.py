@@ -6,10 +6,12 @@ Prepares extracted text for chunking and downstream embedding.
 import re
 import unicodedata
 
+from .normalizers import normalize_text
+
 
 def normalize_unicode(text: str) -> str:
-    """Normalize Unicode characters to NFC form."""
-    return unicodedata.normalize("NFC", text)
+    """Normalize Unicode characters to NFKC form (handles ligatures, superscripts, etc)."""
+    return unicodedata.normalize("NFKC", text)
 
 
 def normalize_whitespace(text: str) -> str:
@@ -40,14 +42,14 @@ def remove_excessive_punctuation(text: str) -> str:
 def fix_encoding_artifacts(text: str) -> str:
     """Fix common encoding issues like mojibake patterns."""
     replacements = {
-        "â€™": "'",
-        "â€œ": '"',
-        "â€\x9d": '"',
-        "â€"": "—",
-        "â€"": "–",
-        "Ã©": "é",
-        "Ã¨": "è",
-        "Ã¼": "ü",
+        "\u00e2\u0080\u0099": "'",
+        "\u00e2\u0080\u009c": '"',
+        "\u00e2\u0080\x9d": '"',
+        "\u00e2\u0080\u0094": "\u2014",  # em dash
+        "\u00e2\u0080\u0093": "\u2013",  # en dash
+        "\u00c3\u00a9": "\u00e9",        # é
+        "\u00c3\u00a8": "\u00e8",        # è
+        "\u00c3\u00bc": "\u00fc",        # ü
         "\ufeff": "",  # BOM
         "\x00": "",    # Null bytes
     }
@@ -58,18 +60,20 @@ def fix_encoding_artifacts(text: str) -> str:
 
 def clean_text(text: str) -> str:
     """
-    Apply the full cleaning pipeline to a piece of text.
+    Apply the full cleaning + normalization pipeline to a piece of text.
 
     Steps:
         1. Fix encoding artifacts
         2. Remove control characters
-        3. Normalize Unicode
+        3. Normalize Unicode (NFKC)
         4. Normalize whitespace
         5. Remove excessive punctuation
+        6. Apply text normalization (typography, OCR repair, LaTeX, etc.)
     """
     text = fix_encoding_artifacts(text)
     text = remove_control_characters(text)
     text = normalize_unicode(text)
     text = normalize_whitespace(text)
     text = remove_excessive_punctuation(text)
+    text = normalize_text(text)
     return text
