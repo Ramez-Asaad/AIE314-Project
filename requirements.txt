@@ -1,0 +1,15 @@
+# Document parsing
+PyPDF2>=3.0.0          # PDF text extraction
+python-docx>=1.1.0     # Word document parsing
+openpyxl>=3.1.0        # Excel file parsing
+python-pptx>=0.6.23    # PowerPoint parsing
+ebooklib>=0.18         # EPUB parsing
+beautifulsoup4>=4.12.0 # HTML content parsing (for EPUB)
+
+# Text processing
+nltk>=3.8.0            # Natural language toolkit
+regex>=2023.0.0        # Advanced regex support
+
+# Utilities
+tqdm>=4.66.0           # Progress bars
+python-dateutil>=2.8.0 # Date parsing
